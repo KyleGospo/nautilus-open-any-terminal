@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # based on: https://github.com/gnunn1/tilix/blob/master/data/nautilus/open-tilix.py
 
+import shlex
 from gettext import gettext, translation
 from os import environ
 from subprocess import Popen
@@ -284,13 +285,16 @@ class OpenAnyTerminalExtension(GObject.GObject, Nautilus.MenuProvider):
         if file_.get_uri_scheme() in REMOTE_URI_SCHEME:
             result = urlparse(file_.get_uri())
             if result.username:
-                value = "ssh -t {0}@{1}".format(result.username, result.hostname)
+                value = "{0}@{1}".format(result.username, result.hostname)
             else:
-                value = "ssh -t {0}".format(result.hostname)
+                value = result.hostname
+            value = "ssh -t " + shlex.quote(value)
             if result.port:
                 value = "{0} -p {1}".format(value, result.port)
             if file_.is_directory():
-                value = '{0} cd "{1}" \\; $SHELL'.format(value, result.path)
+                value = "{0} cd {1} \\; exec \\$SHELL".format(
+                    value, shlex.quote(shlex.quote(unquote(result.path)))
+                )
 
             cmd = terminal_cmd.copy()
             cmd.append(TERM_CMD_PARAMS[terminal])
