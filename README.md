@@ -37,6 +37,7 @@ Right now the plugin is limited to these terminal emulators. If one is missing p
 - `tilix`
 - `urxvt`
 - `urxvtc`
+- `warp`
 - `wezterm`
 - `xfce4-terminal`
 - `xterm`/`uxterm`
@@ -57,7 +58,9 @@ nix-env -iA nixos.nautilus-open-any-terminal
 
 ### From PYPI [![PyPI package](https://repology.org/badge/version-for-repo/pypi/nautilus-open-any-terminal.svg)](https://repology.org/project/nautilus-open-any-terminal/versions)
 
-Dependency to install before: `nautilus-python` (`python-nautilus`/`python3-nautilus`(newer) package on Debian / Ubuntu)
+Dependencies to install before:
+- `nautilus-python` (`python-nautilus`/`python3-nautilus`(newer) package on Debian / Ubuntu)
+- `gir1.2-gtk-4.0` (Debian / Ubuntu)
 
 User install:
 
@@ -71,19 +74,22 @@ System-wide install:
 pip install nautilus-open-any-terminal
 ```
 
+### From source
+```sh
+git clone https://github.com/Stunkymonkey/nautilus-open-any-terminal.git
+cd nautilus-open-any-terminal
+make
+
+make install schema      # User install
+sudo make install schema # System install
+```
+
 ### restart nautilus
 
 Then kill Nautilus to allow it to load the new extension:
 
 ```bash
 nautilus -q
-```
-
-If it does not work, try using the following command (from this repository):
-
-```bash
-./tools/update-extension-user.sh install    # for a user install
-sudo tools/update-extension-system.sh install  # for a system-wide install
 ```
 
 ## Settings
@@ -114,10 +120,9 @@ gsettings set com.github.stunkymonkey.nautilus-open-any-terminal flatpak system
 ```
 
 ## Uninstall
+Since `setup.py` does not provide a natively uninstall method the makefile has an uninstall option.
 
-since `setup.py` does not provide a natively uninstall method the scripts have an uninstall option.
-
-```bash
-./tools/update-extension-user.sh uninstall    # for a user uninstall
-sudo tools/update-extension-system.sh uninstall  # for a system-wide uninstall
+```sh
+make uninstall scheme      # user uninstall
+sudo make uninstall scheme # system uninstall
 ```
