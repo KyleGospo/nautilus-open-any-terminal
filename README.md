@@ -6,6 +6,10 @@ is an extension for nautilus, which adds an context-entry for opening other term
 
 ![screenshot](./screenshot.png)
 
+## Supported file managers
+- Nautilus
+- Caja
+
 ## Supported Terminal Emulators
 
 Right now the plugin is limited to these terminal emulators. If one is missing please open an issue.
@@ -82,6 +86,13 @@ make
 
 make install schema      # User install
 sudo make install schema # System install
+```
+`install` installs this extension to extension directories of all supported file
+managers. To avoid this, use `install-nautilus` or `install-caja` instead.
+
+```sh
+make install-nautilus schema # Install nautilus only
+make install-caja schema # Install caja only
 ```
 
 ### restart nautilus
