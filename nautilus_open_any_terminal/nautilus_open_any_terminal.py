@@ -1,4 +1,5 @@
 """nautilus extension: nautilus_open_any_terminal"""
+
 # based on: https://github.com/gnunn1/tilix/blob/master/data/nautilus/open-tilix.py
 
 import ast
@@ -57,9 +58,15 @@ TERMINALS = {
         flatpak_package="com.raggesilver.BlackBox",
     ),
     "cool-retro-term": Terminal("cool-retro-term", workdir_arguments=["--workdir"]),
+    "contour": Terminal(
+        "Contour",
+        workdir_arguments=["--working-directory"],
+        flatpak_package="org.contourterminal.Contour",
+    ),
     "deepin-terminal": Terminal("Deepin Terminal"),
     "foot": Terminal("Foot"),
     "footclient": Terminal("FootClient"),
+    "ghostty": Terminal("Ghostty"),
     "gnome-terminal": Terminal("Terminal", new_tab_arguments=["--tab"]),
     "guake": Terminal("Guake", workdir_arguments=["--show", "--new-tab"]),
     "hyper": Terminal("Hyper"),
@@ -71,6 +78,7 @@ TERMINALS = {
     "mlterm": Terminal("Mlterm"),
     "ptyxis": Terminal(
         "Ptyxis",
+        workdir_arguments=["-d"],
         command_arguments=["-x"],
         new_tab_arguments=["--tab"],
         new_window_arguments=["--new-window"],
@@ -78,6 +86,7 @@ TERMINALS = {
     ),
     "ptyxis-nightly": Terminal(
         "Ptyxis",
+        workdir_arguments=["-d"],
         command_arguments=["-x"],
         new_tab_arguments=["--tab"],
         new_window_arguments=["--new-window"],
@@ -116,9 +125,11 @@ flatpak = FLATPAK_PARMS[0]
 
 GSETTINGS_PATH = "com.github.stunkymonkey.nautilus-open-any-terminal"
 GSETTINGS_KEYBINDINGS = "keybindings"
+GSETTINGS_BIND_REMOTE = "bind-remote"
 GSETTINGS_TERMINAL = "terminal"
 GSETTINGS_NEW_TAB = "new-tab"
 GSETTINGS_FLATPAK = "flatpak"
+GSETTINGS_USE_GENERIC_TERMINAL_NAME = "use-generic-terminal-name"
 REMOTE_URI_SCHEME = ["ftp", "sftp"]
 
 _ = gettext
@@ -168,43 +179,104 @@ def distro_id() -> set[str]:
     return set(ids)
 
 
-def open_terminal_in_uri(uri: str):
+def open_remote_terminal_in_uri(uri: str):
+    """Open a new remote terminal"""
+    result = urlparse(uri)
+    cmd = terminal_cmd.copy()
+
+    cmd.extend(terminal_data.command_arguments)
+    cmd.extend(["ssh", "-t"])
+    if result.username:
+        cmd.append(f"{result.username}@{result.hostname}")
+    else:
+        cmd.append(result.hostname)
+
+    if result.port:
+        cmd.append("-p")
+        cmd.append(str(result.port))
+
+    cmd.extend(["cd", shlex.quote(unquote(result.path)), ";", "exec", "$SHELL", "-l"])
+
+    Popen(cmd)  # pylint: disable=consider-using-with
+
+
+def open_local_terminal_in_uri(uri: str):
     """open the new terminal with correct path"""
     result = urlparse(uri)
     cmd = terminal_cmd.copy()
-    if result.scheme in REMOTE_URI_SCHEME:
-        cmd.extend(terminal_data.command_arguments)
-        cmd.extend(["ssh", "-t"])
-        if result.username:
-            cmd.append(f"{result.username}@{result.hostname}")
+    if terminal == "warp":
+        Popen(  # pylint: disable=consider-using-with
+            ["xdg-open", f'warp://action/new_{"tab" if new_tab else "window"}?path={result.path}']
+        )
+        return
+
+    filename = unquote(result.path)
+    if new_tab and terminal_data.new_tab_arguments:
+        cmd.extend(terminal_data.new_tab_arguments)
+    elif terminal_data.new_window_arguments:
+        cmd.extend(terminal_data.new_window_arguments)
+
+    if filename and terminal_data.workdir_arguments:
+        cmd.extend(terminal_data.workdir_arguments)
+        cmd.append(filename)
+
+    Popen(cmd, cwd=filename)  # pylint: disable=consider-using-with
+
+
+def menu_item_id(*, foreground: bool, remote: bool):
+    return f"OpenTerminal::open{'_' if foreground else '_bg_'}{'remote' if remote else 'file'}_item"
+
+
+def get_menu_items(file: FileManager.FileInfo, callback, *, foreground: bool, terminal_name: str | None = None):
+    items = []
+    remote = file.get_uri_scheme() in REMOTE_URI_SCHEME
+    terminal_name = terminal_name or terminal_data.name
+
+    if remote:
+        if foreground:
+            REMOTE_LABEL = _("Open In Remote {}")
+            REMOTE_TIP = _("Open Remote {} In {}")
+            LOCAL_LABEL = _("Open In Local {}")
+            LOCAL_TIP = _("Open Local {} In {}")
+            tip = REMOTE_TIP.format(terminal_name, file.get_name())
         else:
-            cmd.append(result.hostname)
+            REMOTE_LABEL = _("Open Remote {} Here")
+            REMOTE_TIP = _("Open Remote {} In This Directory")
+            LOCAL_LABEL = _("Open Local {} Here")
+            LOCAL_TIP = _("Open Local {} In This Directory")
+            tip = REMOTE_TIP.format(terminal_name)
 
-        if result.port:
-            cmd.append("-p")
-            cmd.append(str(result.port))
-
-        cmd.extend(["cd", shlex.quote(unquote(result.path)), ";", "exec", "$SHELL"])
-
-        Popen(cmd)  # pylint: disable=consider-using-with
+        item = FileManager.MenuItem(
+            name=menu_item_id(foreground=foreground, remote=True),
+            label=REMOTE_LABEL.format(terminal_name),
+            tip=tip,
+        )
+        item.connect("activate", callback, file, True)
+        items.append(item)
+    elif foreground:
+        LOCAL_LABEL = _("Open In {}")
+        LOCAL_TIP = _("Open {} In {}")
     else:
-        if terminal == "warp":
-            Popen(  # pylint: disable=consider-using-with
-                ["xdg-open", f'warp://action/new_{"tab" if new_tab else "window"}?path={result.path}']
-            )
-            return
+        LOCAL_LABEL = _("Open {} Here")
+        LOCAL_TIP = _("Open {} In This Directory")
 
-        filename = unquote(result.path)
-        if new_tab and terminal_data.new_tab_arguments:
-            cmd.extend(terminal_data.new_tab_arguments)
-        elif terminal_data.new_window_arguments:
-            cmd.extend(terminal_data.new_window_arguments)
+    # Let wezterm handle opening a local terminal
+    if terminal == "wezterm" and flatpak == "off":
+        return items
 
-        if filename and terminal_data.workdir_arguments:
-            cmd.extend(terminal_data.workdir_arguments)
-            cmd.append(filename)
+    if foreground:
+        tip = LOCAL_TIP.format(terminal_name, file.get_name())
+    else:
+        tip = LOCAL_TIP.format(terminal_name)
 
-        Popen(cmd, cwd=filename)  # pylint: disable=consider-using-with
+    item = FileManager.MenuItem(
+        name=menu_item_id(foreground=foreground, remote=False),
+        label=LOCAL_LABEL.format(terminal_name),
+        tip=tip,
+    )
+    item.connect("activate", callback, file, False)
+    items.append(item)
+    return items
 
 
 def set_terminal_args(*_args):
@@ -246,9 +318,9 @@ def set_terminal_args(*_args):
 
 if API_VERSION in ("3.0", "2.0"):
 
-    class OpenAnyTerminalShortcutProvider(
-        GObject.GObject, FileManager.LocationWidgetProvider
-    ):  # pylint: disable=too-few-public-methods
+    class OpenAnyTerminalShortcutProvider(GObject.GObject, FileManager.LocationWidgetProvider):
+        """Provide keyboard shortcuts for opening terminals in Nautilus."""
+
         def __init__(self):
             gsettings_source = Gio.SettingsSchemaSource.get_default()
             if gsettings_source.lookup(GSETTINGS_PATH, True):
@@ -270,7 +342,10 @@ if API_VERSION in ("3.0", "2.0"):
                 self._create_accel_group()
 
         def _open_terminal(self, *_args):
-            open_terminal_in_uri(self._uri)
+            if _gsettings.get_boolean(GSETTINGS_BIND_REMOTE):
+                open_local_terminal_in_uri(self._uri)
+            else:
+                open_remote_terminal_in_uri(self._uri)
 
         def get_widget(self, uri, window):
             """follows uri and sets the correct window"""
@@ -283,8 +358,23 @@ if API_VERSION in ("3.0", "2.0"):
 
 
 class OpenAnyTerminalExtension(GObject.GObject, FileManager.MenuProvider):
-    def _menu_activate_cb(self, menu, file_):
-        open_terminal_in_uri(file_.get_uri())
+    """Provide context menu items for opening terminals in Nautilus."""
+
+    def __init__(self):
+        gsettings_source = Gio.SettingsSchemaSource.get_default()
+        if gsettings_source.lookup(GSETTINGS_PATH, True):
+            self._gsettings = Gio.Settings.new(GSETTINGS_PATH)
+
+    def _get_terminal_name(self):
+        if self._gsettings.get_boolean(GSETTINGS_USE_GENERIC_TERMINAL_NAME):
+            return _("Terminal")
+        return None
+
+    def _menu_activate_cb(self, menu, file_, remote: bool):
+        if remote:
+            open_remote_terminal_in_uri(file_.get_uri())
+        else:
+            open_local_terminal_in_uri(file_.get_location().get_path())
 
     def get_file_items(self, *args):
         """Generates a list of menu items for a file or folder in the Nautilus file manager."""
@@ -295,32 +385,14 @@ class OpenAnyTerminalExtension(GObject.GObject, FileManager.MenuProvider):
 
         if len(files) != 1:
             return []
-        items = []
         file_ = files[0]
 
         if file_.is_directory():
-            if file_.get_uri_scheme() in REMOTE_URI_SCHEME:
-                uri = file_.get_uri()
-                item = FileManager.MenuItem(
-                    name="OpenTerminal::open_remote_item",
-                    label=_("Open Remote {}").format(terminal_data.name),
-                    tip=_("Open Remote {} In {}").format(terminal_data.name, uri),
-                )
-            else:
-                # Let wezterm handle opening a local terminal
-                if terminal == "wezterm" and flatpak == "off":
-                    return []
+            return get_menu_items(
+                file_, self._menu_activate_cb, foreground=True, terminal_name=self._get_terminal_name()
+            )
 
-                filename = file_.get_name()
-                item = FileManager.MenuItem(
-                    name="OpenTerminal::open_file_item",
-                    label=_("Open In {}").format(terminal_data.name),
-                    tip=_("Open {} In {}").format(terminal_data.name, filename),
-                )
-            item.connect("activate", self._menu_activate_cb, file_)
-            items.append(item)
-
-        return items
+        return []
 
     def get_background_items(self, *args):
         """Generates a list of background menu items for a file or folder in the Nautilus file manager."""
@@ -328,27 +400,7 @@ class OpenAnyTerminalExtension(GObject.GObject, FileManager.MenuProvider):
         # and `[window: Gtk.Widget, file: Nautilus.FileInfo]` in Nautilus 3.0 API.
 
         file_ = args[-1]
-
-        items = []
-        if file_.get_uri_scheme() in REMOTE_URI_SCHEME:
-            item = FileManager.MenuItem(
-                name="OpenTerminal::open_bg_remote_item",
-                label=_("Open Remote {} Here").format(terminal_data.name),
-                tip=_("Open Remote {} In This Directory").format(terminal_data.name),
-            )
-        else:
-            # Let wezterm handle opening a local terminal
-            if terminal == "wezterm" and flatpak == "off":
-                return []
-
-            item = FileManager.MenuItem(
-                name="OpenTerminal::open_bg_file_item",
-                label=_("Open {} Here").format(terminal_data.name),
-                tip=_("Open {} In This Directory").format(terminal_data.name),
-            )
-        item.connect("activate", self._menu_activate_cb, file_)
-        items.append(item)
-        return items
+        return get_menu_items(file_, self._menu_activate_cb, foreground=False, terminal_name=self._get_terminal_name())
 
 
 source = Gio.SettingsSchemaSource.get_default()

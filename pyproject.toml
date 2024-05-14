@@ -1,6 +1,6 @@
 [project]
 name = "nautilus-open-any-terminal"
-version = "0.5.1"
+dynamic = ["version"]
 description = "an extension for nautilus, which adds an context-entry for opening other terminal emulators than gnome-terminal."
 authors = [
     {name = "Felix Buehler", email = "account@buehler.rocks"},
@@ -13,13 +13,16 @@ keywords = [ "nautilus", "extension", "terminal", "gnome"]
 
 [build-system]
 requires = [
-    "setuptools",
+    "setuptools>=61",
+    "setuptools_scm[toml]>=6.2",
     "wheel",
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages]
-find = {namespaces = false}
+[tool.setuptools_scm]
+
+[tool.setuptools.packages.find]
+namespaces = false
 
 [tool.black]
 line-length = 120
@@ -33,5 +36,5 @@ ignore_missing_imports = true
 
 [tool.pylint]
 max-line-length = 120
-ignored-modules = "gi"
-disable = "global-statement,invalid-name,missing-module-docstring,missing-class-docstring,missing-function-docstring"
+ignored-modules = "gi,setuptools"
+disable = "global-statement,invalid-name,missing-module-docstring,missing-class-docstring,missing-function-docstring,too-few-public-methods"

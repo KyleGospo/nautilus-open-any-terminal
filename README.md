@@ -17,8 +17,10 @@ Right now the plugin is limited to these terminal emulators. If one is missing p
 - `alacritty`
 - `blackbox`
 - `cool-retro-term`
+- `contour`
 - `deepin-terminal`
 - `foot`/`footclient`
+- `ghostty`
 - `gnome-terminal`
 - `guake`
 - `hyper`
@@ -65,6 +67,7 @@ nix-env -iA nixos.nautilus-open-any-terminal
 Dependencies to install before:
 - `nautilus-python` (`python-nautilus`/`python3-nautilus`(newer) package on Debian / Ubuntu)
 - `gir1.2-gtk-4.0` (Debian / Ubuntu)
+- `typelib-1_0-Gtk-4_0` (openSUSE)
 
 User install:
 
