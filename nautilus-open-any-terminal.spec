@@ -40,6 +40,7 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/glib-2.0/schemas/com.github.stunkymonkey.%{name}.gschema.xml
 %{_datadir}/locale/*/LC_MESSAGES/%{name}.mo
 %{_datadir}/nautilus-python/extensions/nautilus_open_any_terminal.py
+%{_datadir}/caja-python/extensions/nautilus_open_any_terminal.py
 
 %changelog
 {{{ git_dir_changelog }}}
