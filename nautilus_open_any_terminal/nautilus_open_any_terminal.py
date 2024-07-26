@@ -88,7 +88,7 @@ TERMINALS = {
     "mate-terminal": Terminal("Mate Terminal", new_tab_arguments=["--tab"]),
     "mlterm": Terminal("Mlterm"),
     "ptyxis": Terminal(
-        "Ptyxis",
+        "Terminal",
         workdir_arguments=["-d"],
         command_arguments=["--"],
         new_tab_arguments=["--tab"],
@@ -96,7 +96,7 @@ TERMINALS = {
         flatpak_package="app.devsuite.Ptyxis",
     ),
     "ptyxis-nightly": Terminal(
-        "Ptyxis",
+        "Terminal",
         workdir_arguments=["-d"],
         command_arguments=["--"],
         new_tab_arguments=["--tab"],
