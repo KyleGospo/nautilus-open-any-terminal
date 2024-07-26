@@ -16,6 +16,8 @@ BuildRequires:  gettext
 Requires:       nautilus-python
 Requires:       glib2
 
+%global _python_dist_allow_version_zero 1
+
 %description
 An extension for nautilus, which adds an context-entry for opening other terminal emulators than gnome-terminal.
 
