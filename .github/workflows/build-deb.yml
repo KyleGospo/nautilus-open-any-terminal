@@ -130,7 +130,7 @@ jobs:
           NAUTILUS_PATH: ${{ steps.rename.outputs.NAUTILUS_PATH }}
           CAJA_PATH: ${{ steps.rename.outputs.CAJA_PATH }}
         run: |
-          gh release create "$TAG_NAME" \
+          gh release upload "$TAG_NAME" \
             "$NAUTILUS_PATH" \
             "$CAJA_PATH" \
             --clobber
