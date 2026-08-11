@@ -89,7 +89,12 @@ TERMINALS = {
     ),
     "foot": Terminal("Foot"),
     "footclient": Terminal("FootClient"),
-    "ghostty": Terminal("Ghostty", workdir_arguments=["--working-directory"], workdir_value_inline=True),
+    "ghostty": Terminal(
+        "Ghostty",
+        workdir_arguments=["--working-directory"],
+        workdir_value_inline=True,
+        new_window_arguments=["+new-window"],
+    ),
     "gnome-terminal": Terminal("Terminal", new_tab_arguments=["--tab"], command_arguments=["--"]),
     "guake": Terminal("Guake", workdir_arguments=["--show", "--new-tab"]),
     "kermit": Terminal("Kermit"),
