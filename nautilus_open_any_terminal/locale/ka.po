@@ -1,0 +1,94 @@
+# nautilus_open_any_terminal translation file
+# Copyright (C) 2024 Stunkymonkey
+# This file is distributed under the same license as the nautilus_open_any_terminal package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nautilus_open_any_terminal\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-12-19 12:09+0200\n"
+"PO-Revision-Date: 2026-08-19 14:28+0200\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: nautilus_open_any_terminal.py:75 nautilus_open_any_terminal.py:479
+msgid "Terminal"
+msgstr "ტერმინალი"
+
+#: nautilus_open_any_terminal.py:291
+msgid "Open in Remote {}"
+msgstr "გახსნა დაშორებულ {}-ში"
+
+#: nautilus_open_any_terminal.py:292
+msgid "Open Remote {} in {}"
+msgstr "დაშორებული {}-ის გახსნა {}-ში"
+
+#: nautilus_open_any_terminal.py:293
+msgid "Open in Local {}"
+msgstr "გახსნა ლოკალურ {}-ში"
+
+#: nautilus_open_any_terminal.py:294
+msgid "Open Local {} in {}"
+msgstr "ლოკალური {}-ის გახსნა {}-ში"
+
+#: nautilus_open_any_terminal.py:297
+msgid "Open Remote {} Here"
+msgstr "დაშორებული {}-ის გახსნა აქ"
+
+#: nautilus_open_any_terminal.py:298
+msgid "Open Remote {} in This Directory"
+msgstr "დაშორებული {}-ის გახსნა ამ საქაღალდეში"
+
+#: nautilus_open_any_terminal.py:299
+msgid "Open Local {} Here"
+msgstr "ლოკალური {}-ის გახსნა აქ"
+
+#: nautilus_open_any_terminal.py:300
+msgid "Open Local {} in This Directory"
+msgstr "ლოკალური {}-ის გახსნა ამ საქაღალდეში"
+
+#: nautilus_open_any_terminal.py:311
+msgid "Open in {}"
+msgstr "გახსნა {}-ში"
+
+#: nautilus_open_any_terminal.py:312
+msgid "Open {} in {}"
+msgstr "{}-ის გახსნა {}-ში"
+
+#: nautilus_open_any_terminal.py:314
+msgid "Open {} Here"
+msgstr "{}-ის გახსნა აქ"
+
+#: nautilus_open_any_terminal.py:315
+msgid "Open {} in This Directory"
+msgstr "{}-ის გახსნა ამ საქაღალდეში"
+
+#: nautilus_open_any_terminal.py:342
+msgid "Execute in Remote {}"
+msgstr "შესრულება დაშორებულ {}-ში"
+
+#: nautilus_open_any_terminal.py:343
+msgid "Execute {} in {} via SSH"
+msgstr "{}-ის შესრულება {}-ში SSH-ით"
+
+#: nautilus_open_any_terminal.py:344
+msgid "Execute in Local {}"
+msgstr "შესრულება ლოკალურ {}-ში"
+
+#: nautilus_open_any_terminal.py:345
+msgid "Execute {} in Local {}"
+msgstr "{}-ის შესრულება ლოკალურ {}-ში"
+
+#: nautilus_open_any_terminal.py:356
+msgid "Execute in {}"
+msgstr "შესრულება {}-ში"
+
+#: nautilus_open_any_terminal.py:357
+msgid "Execute {} in {}"
+msgstr "{}-ის შესრულება {}-ში"
