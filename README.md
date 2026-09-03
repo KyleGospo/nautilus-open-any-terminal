@@ -2,7 +2,7 @@
 
 [![Downloads](https://pepy.tech/badge/nautilus-open-any-terminal)](https://pepy.tech/project/nautilus-open-any-terminal)[![Packaging status](https://repology.org/badge/tiny-repos/nautilus-open-any-terminal.svg)](https://repology.org/project/nautilus-open-any-terminal/versions)
 
-is an extension for nautilus, which adds an context-entry for opening other terminal emulators than `gnome-terminal`.
+is an extension for nautilus, which adds a context-entry for opening other terminal emulators than `gnome-terminal`.
 
 ![screenshot](./screenshot.png)
 
